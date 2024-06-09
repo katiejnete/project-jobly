@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlForFilterCompanies } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -66,26 +66,15 @@ class Company {
     if (data.minEmployees || data.maxEmployees) {
       if (data.minEmployees > data.maxEmployees) throw new BadRequestError("minEmployees cannot be greater than maxEmployees");
     }
-    const { setCols, values } = sqlForPartialUpdate(data, {
-      numEmployees: "num_employees",
-      logoUrl: "logo_url",
-    });
-    const handleVarIdx = "$" + (values.length + 1);
+    const cols = sqlForFilterCompanies(data);
 
-    const querySql = `UPDATE companies 
-                      SET ${setCols} 
-                      WHERE handle = ${handleVarIdx} 
-                      RETURNING handle, 
-                                name, 
-                                description, 
-                                num_employees AS "numEmployees", 
-                                logo_url AS "logoUrl"`;
-    const result = await db.query(querySql, [...values, handle]);
-    const company = result.rows[0];
+    const querySql = `SELECT handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"
+                      FROM companies 
+                      WHERE ${cols}`;
+    const companiesRes = await db.query(querySql);
+    if (!companiesRes.rows) throw new NotFoundError(`No companies found`);
 
-    if (!company) throw new NotFoundError(`No company: ${handle}`);
-
-    return company;
+    return companiesRes.rows;
   }
 
   /** Given a company handle, return data about company.
