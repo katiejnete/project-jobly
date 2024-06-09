@@ -104,6 +104,7 @@ describe("filter with findAll", function () {
       },
     ]);
   });
+
   test("filters with minEmployees greater than maxEmployees", async function () {
     const data = { name: "C1", minEmployees: 3, maxEmployees: 1 };
     try {
@@ -112,6 +113,7 @@ describe("filter with findAll", function () {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
+
   test("filters minEmployees and maxEmployees", async function () {
     const data = { minEmployees: 2, maxEmployees: 3 };
     let companies = await Company.findAndFilter(data);
@@ -132,6 +134,7 @@ describe("filter with findAll", function () {
       },
     ]);
   });
+  
   test("findAll when data has inappropriate filtering fields", async function () {
     const data = { doesNotExist: "aldfja" };
     try {

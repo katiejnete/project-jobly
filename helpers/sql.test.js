@@ -12,6 +12,7 @@ describe("sqlForPartialUpdate", function () {
     expect(setCols).toEqual(`"${Object.keys(data)[0]}"=$1`);
     expect(values).toEqual(Object.values(data));
   });
+  
   test("update user with data", function () {
     const data = { username: "miffy" };
     const { setCols, values } = sqlForPartialUpdate(data, {
@@ -21,6 +22,7 @@ describe("sqlForPartialUpdate", function () {
     expect(setCols).toEqual(`"${Object.keys(data)[0]}"=$1`);
     expect(values).toEqual(Object.values(data));
   });
+
   test("update without data", function () {
     // try catch to catch error thrown when no data is sent
     try {
@@ -40,6 +42,7 @@ describe("sqlForPartialUpdate", function () {
       const cols = sqlForFilterCompanies(data);
       expect(cols).toEqual(`"name" LIKE '%${data.name}%'`);
     });
+
     test("query string data contains minEmployees and maxEmployees", () => {
       const data = { minEmployees: 30, maxEmployees: 100 };
       const cols = sqlForFilterCompanies(data);
@@ -47,6 +50,7 @@ describe("sqlForPartialUpdate", function () {
         `"num_employees" >= ${data.minEmployees} AND "num_employees" <= ${data.maxEmployees}`
       );
     });
+
     test("query string data does not contain appropriate filtering fields", () => {
       try {
         const data = { doesNotExist: "flaskjf" };
