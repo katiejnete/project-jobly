@@ -92,7 +92,7 @@ describe("findAll", function () {
 
 describe("filter with findAll", function () {
   test("filters just using name", async function () {
-    const data = { name: "c1" };
+    const data = { name: "C1" };
     let companies = await Company.findAndFilter(data);
     expect(companies).toEqual([
       {
@@ -105,7 +105,7 @@ describe("filter with findAll", function () {
     ]);
   });
   test("filters with minEmployees greater than maxEmployees", async function () {
-    const data = { name: "c1", minEmployees: 3, maxEmployees: 1 };
+    const data = { name: "C1", minEmployees: 3, maxEmployees: 1 };
     try {
       await Company.findAndFilter(data);
     } catch (err) {
