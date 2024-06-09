@@ -21,6 +21,7 @@ describe("sqlForPartialUpdate", function () {
     expect(values).toEqual(Object.values(data));
   });
   test("update without data", function () {
+    // try catch to catch error thrown when no data is sent
     try {
         const data = {};
         sqlForPartialUpdate(data,{
