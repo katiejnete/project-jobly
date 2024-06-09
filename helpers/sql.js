@@ -18,6 +18,12 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 }
 
 function sqlForFilterCompanies(dataToFilter) {
+  if (dataToFilter.minEmployees || dataToFilter.maxEmployees) {
+    if (dataToFilter.minEmployees > dataToFilter.maxEmployees)
+      throw new BadRequestError(
+        "minEmployees cannot be greater than maxEmployees"
+      );
+  }
   const keys = Object.keys(dataToFilter);
   if (keys.length === 0) throw new BadRequestError("No data");
 
@@ -25,6 +31,12 @@ function sqlForFilterCompanies(dataToFilter) {
   const cols = [];
   let idx = 0;
   for (let colName of keys) {
+    if (
+      colName !== "name" &&
+      colName !== "minEmployees" &&
+      colName !== "maxEmployees"
+    )
+      throw new BadRequestError("Contains inappropriate filtering field(s)");
     if (colName.includes("name")) {
       cols.push(`"${colName}" LIKE '%${dataToFilter.name}%'`);
     } else if (colName.includes("min")) {
@@ -35,7 +47,7 @@ function sqlForFilterCompanies(dataToFilter) {
     idx++;
   }
   if (cols.length > 1) return cols.join(" AND ");
-  return cols;
+  else return cols[0];
 }
 
 module.exports = { sqlForPartialUpdate, sqlForFilterCompanies };

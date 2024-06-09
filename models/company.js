@@ -2,7 +2,10 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate, sqlForFilterCompanies } = require("../helpers/sql");
+const {
+  sqlForPartialUpdate,
+  sqlForFilterCompanies,
+} = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -63,9 +66,6 @@ class Company {
    * */
 
   static async findAndFilter(data) {
-    if (data.minEmployees || data.maxEmployees) {
-      if (data.minEmployees > data.maxEmployees) throw new BadRequestError("minEmployees cannot be greater than maxEmployees");
-    }
     const cols = sqlForFilterCompanies(data);
 
     const querySql = `SELECT handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"

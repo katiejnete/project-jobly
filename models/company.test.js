@@ -132,6 +132,14 @@ describe("filter with findAll", function () {
       },
     ]);
   });
+  test("findAll when data has inappropriate filtering fields", async function () {
+    const data = { doesNotExist: "aldfja" };
+    try {
+      await Company.findAndFilter(data);
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
 });
 
 /************************************** get */
