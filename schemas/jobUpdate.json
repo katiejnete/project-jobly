@@ -20,6 +20,7 @@
             "type": "integer",
             "default": 0,
             "title": "The salary Schema",
+            "minimum": 0,
             "examples": [
                 100000
             ]
@@ -27,6 +28,7 @@
         "equity": {
             "type": "number",
             "default": 0.0,
+            "maximum": 1.0,
             "title": "The equity Schema",
             "examples": [
                 0.01

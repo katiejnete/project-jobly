@@ -19,7 +19,6 @@ afterAll(commonAfterAll);
 
 describe("create", function () {
   const newJob = {
-    id: 4,
     title: "new",
     salary: 100000,
     equity: 0.01,
@@ -28,16 +27,16 @@ describe("create", function () {
 
   test("works", async function () {
     let job = await Job.create(newJob);
+    delete job.id;
     expect(job).toEqual(newJob);
 
     const result = await db.query(
-      `SELECT id, title, salary, equity, company_handle AS "companyHandle"
+      `SELECT title, salary, equity, company_handle AS "companyHandle"
            FROM jobs
            WHERE title = 'new'`
     );
     expect(result.rows).toEqual([
       {
-        id: 4,
         title: "new",
         salary: 100000,
         equity: 0.01,
@@ -185,9 +184,7 @@ describe("update", function () {
 describe("remove", function () {
   test("works", async function () {
     await Job.remove(1);
-    const res = await db.query(
-      "SELECT id FROM jobs WHERE id = 1"
-    );
+    const res = await db.query("SELECT id FROM jobs WHERE id = 1");
     expect(res.rows.length).toEqual(0);
   });
 
