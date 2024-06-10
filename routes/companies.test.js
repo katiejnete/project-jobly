@@ -155,6 +155,16 @@ describe("GET /companies", function () {
     expect(resp.statusCode).toEqual(400);
   });
 
+  test("fails with invalid query string 1", async () => {
+    const resp = await request(app).get("/companies?minEmployees=3&maxEmployees=1");
+    expect(resp.statusCode).toEqual(400);
+  });
+
+  test("fails with invalid query string 2", async () => {
+    const resp = await request(app).get("/companies?minEmployees=notInt");
+    expect(resp.statusCode).toEqual(400);
+  });
+
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
     // thus making it hard to test that the error-handler works with it. This
