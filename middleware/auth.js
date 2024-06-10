@@ -57,8 +57,24 @@ function ensureAdmin(req, res, next) {
   }
 }
 
+/** Middleware to use when they must be admin or accessing for same user.
+ *
+ * If not, raises Unauthorized.
+ */
+
+function ensureAdminOrSameUser(req, res, next) {
+  try {
+    const username = req.params.username;
+    if (!res.locals.user.isAdmin && res.locals.user.username !== username) throw new UnauthorizedError();
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
-  ensureAdmin
+  ensureAdmin,
+  ensureAdminOrSameUser
 };
