@@ -20,6 +20,31 @@ class Company {
    *
    * Throws BadRequestError if company already in database.
    * */
+  constructor(handle, name, description, numEmployees, logoUrl) {
+    this.handle = handle;
+    this.name = name;
+    this.description = description;
+    this.numEmployees = numEmployees;
+    this.logoUrl = logoUrl;
+  }
+
+  /** Find all jobs associated with a company.
+   *
+   * Returns [{ id, title, salary, equity, companyHandle }, ...]
+   * */
+
+  async getJobs() {
+    const results = await db.query(
+      `SELECT id,
+                  title,
+                  salary,
+                  equity,
+                  company_handle AS "companyHandle"
+           FROM jobs WHERE company_handle = $1`,
+      [this.handle]
+    );
+    return results.rows;
+  }
 
   static async create({ handle, name, description, numEmployees, logoUrl }) {
     const duplicateCheck = await db.query(
@@ -104,26 +129,18 @@ class Company {
                   name,
                   description,
                   num_employees AS "numEmployees",
-                  logo_url AS "logoUrl",
-                  id,
-                  title,
-                  salary,
-                  equity,
-                  company_handle AS "companyHandle"
-           FROM companies AS c JOIN jobs AS j ON c.handle = j.company_handle
+                  logo_url AS "logoUrl"
+           FROM companies
            WHERE handle = $1`,
       [handle]
     );
     if (!companyRes.rows.length)
     throw new NotFoundError(`No company: ${handle}`);
-    const jobs = [];
-    for (let row of companyRes.rows) {
-      const { id, title, salary, equity, companyHandle } = row;
-      jobs.push({ id, title, salary, equity, companyHandle });
-    }
-    const { name, description, numEmployees, logoUrl } = companyRes.rows[0];
-    const company = { handle, name, description, numEmployees, logoUrl, jobs };
-
+    const c = companyRes.rows[0];
+    const company = new Company(handle, c.name, c.description, c.numEmployees, c.logoUrl);
+    const jobs = await company.getJobs();
+    company.jobs = jobs;
+    
     return company;
   }
 
