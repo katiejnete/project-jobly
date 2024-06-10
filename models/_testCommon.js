@@ -42,7 +42,7 @@ async function commonBeforeAll() {
 
   await db.query(`
   INSERT INTO applications(username,job_id)
-  VALUES ('u2',2)`)
+  VALUES ('u2',2)`);
 }
 
 async function commonBeforeEach() {

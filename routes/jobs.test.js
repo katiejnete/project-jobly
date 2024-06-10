@@ -264,7 +264,7 @@ describe("DELETE /jobs/:handle", function () {
     const resp = await request(app)
       .delete(`/jobs/1`)
       .set("authorization", `Bearer ${u3Token}`);
-    expect(resp.body).toEqual({ deleted: "1" });
+    expect(resp.body).toEqual({ deleted: 1 });
   });
 
   test("unauth for anon", async function () {

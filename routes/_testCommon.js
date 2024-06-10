@@ -12,6 +12,7 @@ async function commonBeforeAll() {
   await db.query("DELETE FROM companies");
   await db.query("DELETE FROM jobs");
   await db.query("ALTER SEQUENCE jobs_id_seq RESTART WITH 1");
+  await db.query("DELETE FROM applications");
 
   await Company.create({
     handle: "c1",
@@ -72,6 +73,9 @@ async function commonBeforeAll() {
     password: "password3",
     isAdmin: true,
   });
+  await db.query(`
+  INSERT INTO applications(username,job_id)
+  VALUES ('u2',2)`);
 }
 
 async function commonBeforeEach() {
