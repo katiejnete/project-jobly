@@ -6,6 +6,8 @@ const {
   sqlForPartialUpdate,
   sqlForFilterJobs
 } = require("../helpers/sql");
+const jsonschema = require("jsonschema");
+const jobFilterSchema = require("../schemas/jobFilter.json");
 
 /** Related functions for jobs. */
 
@@ -56,6 +58,17 @@ class Job {
    * */
 
   static async findAndFilter(data) {
+    if (data.minSalary) {
+      data.minSalary = parseInt(data.minSalary);
+    }
+    if (data.hasEquity) {
+      data.hasEquity = (data.hasEquity === "true");
+    }
+    const validator = jsonschema.validate(data, jobFilterSchema);
+    if (!validator.valid) {
+      const errs = validator.errors.map((e) => e.stack);
+      throw new BadRequestError(errs);
+    }
     const cols = sqlForFilterJobs(data);
 
     const querySql = `SELECT id, title, salary, equity, company_handle AS "companyHandle"
