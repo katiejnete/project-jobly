@@ -8,12 +8,22 @@ const {
   BadRequestError,
   UnauthorizedError,
 } = require("../expressError");
+const Application = require("./application")
 
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
 
 /** Related functions for users. */
 
 class User {
+  constructor(username, password, firstName, lastName, email, isAdmin) {
+    this.username = username;
+    this.password = password;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.isAdmin = isAdmin;
+    this.appliedJobs = null;
+  }
   /** authenticate user with username, password.
    *
    * Returns { username, first_name, last_name, email, is_admin }
@@ -203,6 +213,28 @@ class User {
     const user = result.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
+  }
+
+    /** Adds to user's applied jobs. */
+
+  async applyForJob(jobId) {
+    await Application.create(this.username, jobId);
+    return jobId;
+  }
+
+  /** Find all applied jobs associated with a user.
+   *
+   * Returns [ jobId, ...]
+   * */
+
+  async getAppliedJobs() {
+    const results = await db.query(
+      `SELECT job_id
+             FROM jobs WHERE username = $1`,
+      [this.username]
+    );
+    this.appliedJobs = results.rows;
+    return this;
   }
 }
 

@@ -29,25 +29,6 @@ class Company {
     this.jobs = null;
   }
 
-  /** Find all jobs associated with a company.
-   *
-   * Returns [{ id, title, salary, equity, companyHandle }, ...]
-   * */
-
-  async getJobs() {
-    const results = await db.query(
-      `SELECT id,
-                  title,
-                  salary,
-                  equity,
-                  company_handle AS "companyHandle"
-           FROM jobs WHERE company_handle = $1`,
-      [this.handle]
-    );
-    this.jobs = results.rows;
-    return this;
-  }
-
   static async create({ handle, name, description, numEmployees, logoUrl }) {
     const duplicateCheck = await db.query(
       `SELECT handle
@@ -137,9 +118,15 @@ class Company {
       [handle]
     );
     if (!companyRes.rows.length)
-    throw new NotFoundError(`No company: ${handle}`);
+      throw new NotFoundError(`No company: ${handle}`);
     const c = companyRes.rows[0];
-    const company = new Company(handle, c.name, c.description, c.numEmployees, c.logoUrl);
+    const company = new Company(
+      handle,
+      c.name,
+      c.description,
+      c.numEmployees,
+      c.logoUrl
+    );
     await company.getJobs();
 
     return company;
@@ -196,6 +183,25 @@ class Company {
     const company = result.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
+  }
+
+  /** Find all jobs associated with a company.
+   *
+   * Returns [{ id, title, salary, equity, companyHandle }, ...]
+   * */
+
+  async getJobs() {
+    const results = await db.query(
+      `SELECT id,
+                    title,
+                    salary,
+                    equity,
+                    company_handle AS "companyHandle"
+             FROM jobs WHERE company_handle = $1`,
+      [this.handle]
+    );
+    this.jobs = results.rows;
+    return this;
   }
 }
 
