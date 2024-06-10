@@ -140,6 +140,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
+      jobs: []
     });
   });
 
@@ -228,3 +229,12 @@ describe("remove", function () {
     }
   });
 });
+
+/************************************** Add job application for user */
+
+// describe("add job application", function () {
+//   test("works for admin", async function () {
+    
+//   })
+// });
+

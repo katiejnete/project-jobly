@@ -9,7 +9,7 @@ class Application {
    *
    * data should be { username, jobId }
    *
-   * Returns { username, jobId}
+   * Returns { username, jobId }
    *
    * */
 
