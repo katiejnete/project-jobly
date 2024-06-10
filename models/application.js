@@ -13,7 +13,7 @@ class Application {
    *
    * */
 
-  static async create({ username, jobId }) {
+  static async create( username, jobId ) {
     const result = await db.query(
         `INSERT INTO applications
         (username, job_id)

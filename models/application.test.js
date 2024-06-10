@@ -17,14 +17,14 @@ afterAll(commonAfterAll);
 /************************************** create */
 
 describe("create", function () {
-  const newApplication = {
+  const newApp = {
     username: "u1",
     jobId: 1
   };
 
   test("works", async function () {
-    let application = await Application.create(newApplication);
-    expect(application).toEqual(newApplication);
+    let application = await Application.create(newApp.username, newApp.jobId);
+    expect(application).toEqual(newApp);
 
     const result = await db.query(
       `SELECT username, job_id AS "jobId"
