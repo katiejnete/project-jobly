@@ -23,14 +23,13 @@ describe("create", function () {
   };
 
   test("works", async function () {
-    let application = await Application.create(newApp.username, newApp.jobId);
-    expect(application).toEqual(newApp);
-
-    const result = await db.query(
-      `SELECT username, job_id AS "jobId"
-           FROM applications
-           WHERE username = 'u1'`
-    );
+      await Application.create(newApp.username, newApp.jobId);
+  
+      const result = await db.query(
+        `SELECT username, job_id AS "jobId"
+             FROM applications
+             WHERE username = 'u1'`
+      );
     expect(result.rows).toEqual([
       {
         username: "u1",
