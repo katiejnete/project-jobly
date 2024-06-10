@@ -213,9 +213,7 @@ class User {
   /** Adds to user's applied jobs. */
 
   async applyForJob(jobId) {
-    const result = await Application.create(this.username, jobId);
-
-    if (!result.rows.length) throw new NotFoundError(`No job id: ${jobId}`);
+    await Application.create(this.username, jobId);
     return jobId;
   }
 
@@ -230,7 +228,10 @@ class User {
              FROM applications WHERE username = $1`,
       [this.username]
     );
-    if (results.rows.length) this.jobs = results.rows;
+    if (results.rows.length) {
+      const jobs = results.rows.map(row => row.job_id);
+      this.jobs = jobs;
+    }
     return this;
   }
 }

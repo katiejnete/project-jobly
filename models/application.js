@@ -1,6 +1,7 @@
 "use strict";
 
 const db = require("../db");
+const { NotFoundError } = require("../expressError");
 
 /** Related functions for applications. */
 
@@ -13,13 +14,17 @@ class Application {
    *
    * */
 
-  static async create( username, jobId ) {
-    const result = await db.query(
+  static async create(username, jobId) {
+    try {
+      await db.query(
         `INSERT INTO applications
         (username, job_id)
-        VALUES ($1, $2) RETURNING username, job_id AS "jobId"`
-    ,[username, jobId]);
-    return result.rows[0];
+        VALUES ($1, $2)`,
+        [username, jobId]
+      );
+    } catch (err) {
+      throw new NotFoundError(`No job id: ${jobId}`);
+    }
   }
 }
 

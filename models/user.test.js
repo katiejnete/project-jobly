@@ -131,8 +131,8 @@ describe("findAll", function () {
 
 /************************************** get */
 
-describe("get", function () {
-  test("works", async function () {
+describe("get user", function () {
+  test("works with no applied jobs", async function () {
     let user = await User.get("u1");
     expect(user).toEqual({
       username: "u1",
@@ -141,6 +141,18 @@ describe("get", function () {
       email: "u1@email.com",
       isAdmin: false,
       jobs: []
+    });
+  });
+
+  test("works with 1 applied job", async function () {
+    let user = await User.get("u2");
+    expect(user).toEqual({
+      username: "u2",
+      firstName: "U2F",
+      lastName: "U2L",
+      email: "u2@email.com",
+      isAdmin: false,
+      jobs: [2]
     });
   });
 
@@ -232,9 +244,37 @@ describe("remove", function () {
 
 /************************************** Add job application for user */
 
-// describe("add job application", function () {
-//   test("works for admin", async function () {
-    
-//   })
-// });
+describe("add job application", function () {
+  test("works", async function () {
+    const user = await User.get("u1");
+    const appliedJobId = await user.applyForJob(1);
+    expect(appliedJobId).toEqual(1);
+  });
+
+  test("not found if job id does not exist", async function () {
+    try {
+      const user = await User.get("u1");
+      await user.applyForJob(0);
+    } catch (err) {
+      console.log(err);
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
+
+/************************************** Get all jobs for user */
+
+describe("get all jobs for user", function () {
+  test("works for user with applied jobs", async function () {
+    const user = await User.get("u2");
+    await user.getAppliedJobs();
+    expect(user.jobs).toEqual([2]);
+  });
+
+  test("works for user with applied jobs", async function () {
+    const user = await User.get("u1");
+    await user.getAppliedJobs();
+    expect(user.jobs).toEqual([]);
+  });
+});
 
