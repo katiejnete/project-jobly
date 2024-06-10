@@ -4,6 +4,7 @@ const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
 const {
   sqlForPartialUpdate,
+  sqlForFilterJobs
 } = require("../helpers/sql");
 
 /** Related functions for jobs. */
@@ -49,21 +50,21 @@ class Job {
     return jobsRes.rows;
   }
 
-  /** Find all companies with filter.
+  /** Find all jobs with filter.
    *
-   * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
+   * Returns [{ id, title, salary, equity, companyHandle }, ...]
    * */
 
   static async findAndFilter(data) {
-    const cols = sqlForFilterCompanies(data);
+    const cols = sqlForFilterJobs(data);
 
-    const querySql = `SELECT handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"
+    const querySql = `SELECT id, title, salary, equity, company_handle AS "companyHandle"
                       FROM jobs 
                       WHERE ${cols}`;
-    const companiesRes = await db.query(querySql);
-    if (!companiesRes.rows) throw new NotFoundError(`No companies found`);
+    const jobsRes = await db.query(querySql);
+    if (!jobsRes.rows) throw new NotFoundError(`No jobs found`);
 
-    return companiesRes.rows;
+    return jobsRes.rows;
   }
 
   /** Given a job id, return data about job.

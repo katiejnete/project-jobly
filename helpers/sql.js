@@ -27,7 +27,7 @@ function sqlForFilterCompanies(dataToFilter) {
   const keys = Object.keys(dataToFilter);
   if (keys.length === 0) throw new BadRequestError("No data");
 
-  // {minEmployees: 2, maxEmployees: 3} => ['num_employees >= 2 AND num_employees <= 3']
+  // {minEmployees: 2, maxEmployees: 3} => 'num_employees >= 2 AND num_employees <= 3'
   const cols = [];
   let idx = 0;
   for (let colName of keys) {
@@ -38,7 +38,7 @@ function sqlForFilterCompanies(dataToFilter) {
     )
       throw new BadRequestError("Contains inappropriate filtering field(s)");
     if (colName.includes("name")) {
-      cols.push(`"${colName}" LIKE '%${dataToFilter.name}%'`);
+      cols.push(`"${colName}" ILIKE '%${dataToFilter.name}%'`);
     } else if (colName.includes("min")) {
       cols.push(`"num_employees" >= ${dataToFilter.minEmployees}`);
     } else {
@@ -50,4 +50,31 @@ function sqlForFilterCompanies(dataToFilter) {
   else return cols[0];
 }
 
-module.exports = { sqlForPartialUpdate, sqlForFilterCompanies };
+function sqlForFilterJobs(dataToFilter) {
+  const keys = Object.keys(dataToFilter);
+  if (keys.length === 0) throw new BadRequestError("No data");
+
+  // {title: "new", minSalary: 100000, hasEquity: true} => 'title = 'new' AND salary >= 100000 AND equity > 0'
+  const cols = [];
+  let idx = 0;
+  for (let colName of keys) {
+    if (
+      colName !== "title" &&
+      colName !== "minSalary" &&
+      colName !== "hasEquity"
+    )
+      throw new BadRequestError("Contains inappropriate filtering field(s)");
+    if (colName.includes("title")) {
+      cols.push(`"${colName}" ILIKE '%${dataToFilter.title}%'`);
+    } else if (colName.includes("min")) {
+      cols.push(`"salary" >= ${dataToFilter.minSalary}`);
+    } else if (colName.includes("has")) {
+      if (dataToFilter.hasEquity) cols.push(`"equity" > 0`);
+    }
+    idx++;
+  }
+  if (cols.length > 1) return cols.join(" AND ");
+  else return cols[0];
+}
+
+module.exports = { sqlForPartialUpdate, sqlForFilterCompanies, sqlForFilterJobs };

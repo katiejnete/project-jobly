@@ -110,47 +110,40 @@ describe("GET /jobs", function () {
     });
   });
 
-  // test("filter with name", async () => {
-  //   const resp = await request(app).get("/jobs?name=C1");
-  //   expect(resp.body).toEqual({
-  //     jobs: [
-  //       {
-  //         handle: "c1",
-  //         name: "C1",
-  //         description: "Desc1",
-  //         numEmployees: 1,
-  //         logoUrl: "http://c1.img",
-  //       },
-  //     ],
-  //   });
-  // });
+  test("filter with title", async () => {
+    const resp = await request(app).get("/jobs?title=j1");
+    expect(resp.body).toEqual({
+      jobs: [
+        {
+          id: 1,
+          title: "j1",
+          salary: 100000,
+          equity: 0.01,
+          companyHandle: "c1",
+        },
+      ],
+    });
+  });
 
-  // test("filter with minEmployees and maxEmployees", async () => {
-  //   const resp = await request(app).get("/jobs?minEmployees=2&maxEmployees=3");
-  //   expect(resp.body).toEqual({
-  //     jobs: [
-  //       {
-  //         handle: "c2",
-  //         name: "C2",
-  //         description: "Desc2",
-  //         numEmployees: 2,
-  //         logoUrl: "http://c2.img",
-  //       },
-  //       {
-  //         handle: "c3",
-  //         name: "C3",
-  //         description: "Desc3",
-  //         numEmployees: 3,
-  //         logoUrl: "http://c3.img",
-  //       },
-  //     ],
-  //   });
-  // });
+  test("filter with minSalary and hasEquity", async () => {
+    const resp = await request(app).get("/jobs?minSalary=300000&hasEquity=true");
+    expect(resp.body).toEqual({
+      jobs: [
+        {
+          id: 3,
+          title: "j3",
+          salary: 300000,
+          equity: 0.03,
+          companyHandle: "c3",
+        },
+      ],
+    });
+  });
 
-  // test("fails with inappropriate query string", async () => {
-  //   const resp = await request(app).get("/jobs?doesNotExist=flaskjef");
-  //   expect(resp.statusCode).toEqual(400);
-  // });
+  test("fails with inappropriate query string", async () => {
+    const resp = await request(app).get("/jobs?doesNotExist=flaskjef");
+    expect(resp.statusCode).toEqual(400);
+  });
 
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
