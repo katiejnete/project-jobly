@@ -26,6 +26,7 @@ class Company {
     this.description = description;
     this.numEmployees = numEmployees;
     this.logoUrl = logoUrl;
+    this.jobs = null;
   }
 
   /** Find all jobs associated with a company.
@@ -43,7 +44,8 @@ class Company {
            FROM jobs WHERE company_handle = $1`,
       [this.handle]
     );
-    return results.rows;
+    this.jobs = results.rows;
+    return this;
   }
 
   static async create({ handle, name, description, numEmployees, logoUrl }) {
@@ -138,9 +140,8 @@ class Company {
     throw new NotFoundError(`No company: ${handle}`);
     const c = companyRes.rows[0];
     const company = new Company(handle, c.name, c.description, c.numEmployees, c.logoUrl);
-    const jobs = await company.getJobs();
-    company.jobs = jobs;
-    
+    await company.getJobs();
+
     return company;
   }
 
