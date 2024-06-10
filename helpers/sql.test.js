@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { sqlForPartialUpdate, sqlForFilterCompanies } = require("./sql");
+const { sqlForPartialUpdate, sqlForFilterCompanies, sqlForFilterJobs } = require("./sql");
 const { BadRequestError } = require("../expressError");
 
 describe("sqlForPartialUpdate", function () {
@@ -40,7 +40,7 @@ describe("sqlForPartialUpdate", function () {
     test("query string data contains name", () => {
       const data = { name: "and" };
       const cols = sqlForFilterCompanies(data);
-      expect(cols).toEqual(`"name" LIKE '%${data.name}%'`);
+      expect(cols).toEqual(`"name" ILIKE '%${data.name}%'`);
     });
 
     test("query string data contains minEmployees and maxEmployees", () => {
@@ -54,7 +54,32 @@ describe("sqlForPartialUpdate", function () {
     test("query string data does not contain appropriate filtering fields", () => {
       try {
         const data = { doesNotExist: "flaskjf" };
-        const cols = sqlForFilterCompanies(data);
+        sqlForFilterCompanies(data);
+      } catch (err) {
+        expect(err instanceof BadRequestError).toBeTruthy();
+      }
+    });
+  });
+
+  describe("sqlForFilterJobs", () => {
+    test("query string data contains title", () => {
+      const data = { title: "SWE" };
+      const cols = sqlForFilterJobs(data);
+      expect(cols).toEqual(`"title" ILIKE '%${data.title}%'`);
+    });
+
+    test("query string data contains minSalary and hasEquity", () => {
+      const data = { minSalary: 100000, hasEquity: true };
+      const cols = sqlForFilterJobs(data);
+      expect(cols).toEqual(
+        `"salary" >= ${data.minSalary} AND "equity" > 0`
+      );
+    });
+
+    test("query string data does not contain appropriate filtering fields", () => {
+      try {
+        const data = { doesNotExist: "flaskjf" };
+        sqlForFilterJobs(data);
       } catch (err) {
         expect(err instanceof BadRequestError).toBeTruthy();
       }
