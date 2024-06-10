@@ -1,6 +1,6 @@
 "use strict";
 /** Database setup for jobly. */
-const { Client } = require("pg");
+const { Client, types } = require("pg");
 const { getDatabaseUri } = require("./config");
 
 let db;
@@ -19,5 +19,9 @@ if (process.env.NODE_ENV === "production") {
 }
 
 db.connect();
+
+types.setTypeParser(1700, val => {
+  return parseFloat(val);
+});
 
 module.exports = db;
