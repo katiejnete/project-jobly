@@ -6,6 +6,9 @@ const {
   sqlForPartialUpdate,
   sqlForFilterCompanies,
 } = require("../helpers/sql");
+const jsonschema = require("jsonschema");
+const companyFilterSchema = require("../schemas/companyFilter.json");
+
 
 /** Related functions for companies. */
 
@@ -66,6 +69,17 @@ class Company {
    * */
 
   static async findAndFilter(data) {
+    if (data.minEmployees) {
+      data.minEmployees = parseInt(data.minEmployees);
+    }
+    if (data.maxEmployees) {
+      data.maxEmployees = parseInt(data.maxEmployees);
+    }
+    const validator = jsonschema.validate(data, companyFilterSchema);
+    if (!validator.valid) {
+      const errs = validator.errors.map((e) => e.stack);
+      throw new BadRequestError(errs);
+    }
     const cols = sqlForFilterCompanies(data);
 
     const querySql = `SELECT handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"
