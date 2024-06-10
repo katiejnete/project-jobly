@@ -148,17 +148,6 @@ describe("filter with findAll", function () {
 /************************************** get */
 
 describe("get", function () {
-  test("works", async function () {
-    let company = await Company.get("c1");
-    expect(company).toEqual({
-      handle: "c1",
-      name: "C1",
-      description: "Desc1",
-      numEmployees: 1,
-      logoUrl: "http://c1.img",
-    });
-  });
-
   test("shows company and info about jobs associated with the company", async function () {
     let company = await Company.get("c1");
     expect(company).toEqual({
@@ -167,6 +156,13 @@ describe("get", function () {
       description: "Desc1",
       numEmployees: 1,
       logoUrl: "http://c1.img",
+      jobs: [{
+        id: 1,
+        title: "j1",
+        salary: 100000,
+        equity: 0.01,
+        companyHandle: "c1",
+      }]
     });
   });
 

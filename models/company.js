@@ -114,16 +114,15 @@ class Company {
            WHERE handle = $1`,
       [handle]
     );
+    if (!companyRes.rows.length)
+    throw new NotFoundError(`No company: ${handle}`);
     const jobs = [];
     for (let row of companyRes.rows) {
       const { id, title, salary, equity, companyHandle } = row;
       jobs.push({ id, title, salary, equity, companyHandle });
     }
-    const { name, description, numEmployees, logoUrl } =
-      companyRes.rows[0];
+    const { name, description, numEmployees, logoUrl } = companyRes.rows[0];
     const company = { handle, name, description, numEmployees, logoUrl, jobs };
-    if (!companyRes.rows.length)
-      throw new NotFoundError(`No company: ${handle}`);
 
     return company;
   }
