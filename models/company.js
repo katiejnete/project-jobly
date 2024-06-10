@@ -9,7 +9,6 @@ const {
 const jsonschema = require("jsonschema");
 const companyFilterSchema = require("../schemas/companyFilter.json");
 
-
 /** Related functions for companies. */
 
 class Company {
@@ -105,15 +104,26 @@ class Company {
                   name,
                   description,
                   num_employees AS "numEmployees",
-                  logo_url AS "logoUrl"
-           FROM companies
+                  logo_url AS "logoUrl",
+                  id,
+                  title,
+                  salary,
+                  equity,
+                  company_handle AS "companyHandle"
+           FROM companies AS c JOIN jobs AS j ON c.handle = j.company_handle
            WHERE handle = $1`,
       [handle]
     );
-
-    const company = companyRes.rows[0];
-
-    if (!company) throw new NotFoundError(`No company: ${handle}`);
+    const jobs = [];
+    for (let row of companyRes.rows) {
+      const { id, title, salary, equity, companyHandle } = row;
+      jobs.push({ id, title, salary, equity, companyHandle });
+    }
+    const { name, description, numEmployees, logoUrl } =
+      companyRes.rows[0];
+    const company = { handle, name, description, numEmployees, logoUrl, jobs };
+    if (!companyRes.rows.length)
+      throw new NotFoundError(`No company: ${handle}`);
 
     return company;
   }

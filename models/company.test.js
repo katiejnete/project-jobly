@@ -159,6 +159,17 @@ describe("get", function () {
     });
   });
 
+  test("shows company and info about jobs associated with the company", async function () {
+    let company = await Company.get("c1");
+    expect(company).toEqual({
+      handle: "c1",
+      name: "C1",
+      description: "Desc1",
+      numEmployees: 1,
+      logoUrl: "http://c1.img",
+    });
+  });
+
   test("not found if no such company", async function () {
     try {
       await Company.get("nope");
