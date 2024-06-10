@@ -17,32 +17,27 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-function sqlForFilterCompanies(dataToFilter) {
-  if (dataToFilter.minEmployees || dataToFilter.maxEmployees) {
-    if (dataToFilter.minEmployees > dataToFilter.maxEmployees)
+function sqlForFilterCompanies(data) {
+  const keys = Object.keys(data);
+  if (keys.length === 0) throw new BadRequestError("No data");
+
+  if (data.minEmployees && data.maxEmployees) {
+    if (data.minEmployees > data.maxEmployees)
       throw new BadRequestError(
         "minEmployees cannot be greater than maxEmployees"
       );
   }
-  const keys = Object.keys(dataToFilter);
-  if (keys.length === 0) throw new BadRequestError("No data");
 
   // {minEmployees: 2, maxEmployees: 3} => 'num_employees >= 2 AND num_employees <= 3'
   const cols = [];
   let idx = 0;
   for (let colName of keys) {
-    if (
-      colName !== "name" &&
-      colName !== "minEmployees" &&
-      colName !== "maxEmployees"
-    )
-      throw new BadRequestError("Contains inappropriate filtering field(s)");
     if (colName.includes("name")) {
-      cols.push(`"${colName}" ILIKE '%${dataToFilter.name}%'`);
+      cols.push(`"${colName}" ILIKE '%${data.name}%'`);
     } else if (colName.includes("min")) {
-      cols.push(`"num_employees" >= ${dataToFilter.minEmployees}`);
+      cols.push(`"num_employees" >= ${data.minEmployees}`);
     } else {
-      cols.push(`"num_employees" <= ${dataToFilter.maxEmployees}`);
+      cols.push(`"num_employees" <= ${data.maxEmployees}`);
     }
     idx++;
   }
@@ -50,26 +45,20 @@ function sqlForFilterCompanies(dataToFilter) {
   else return cols[0];
 }
 
-function sqlForFilterJobs(dataToFilter) {
-  const keys = Object.keys(dataToFilter);
+function sqlForFilterJobs(data) {
+  const keys = Object.keys(data);
   if (keys.length === 0) throw new BadRequestError("No data");
 
   // {title: "new", minSalary: 100000, hasEquity: true} => 'title = 'new' AND salary >= 100000 AND equity > 0'
   const cols = [];
   let idx = 0;
   for (let colName of keys) {
-    if (
-      colName !== "title" &&
-      colName !== "minSalary" &&
-      colName !== "hasEquity"
-    )
-      throw new BadRequestError("Contains inappropriate filtering field(s)");
     if (colName.includes("title")) {
-      cols.push(`"${colName}" ILIKE '%${dataToFilter.title}%'`);
+      cols.push(`"${colName}" ILIKE '%${data.title}%'`);
     } else if (colName.includes("min")) {
-      cols.push(`"salary" >= ${dataToFilter.minSalary}`);
+      cols.push(`"salary" >= ${data.minSalary}`);
     } else if (colName.includes("has")) {
-      if (dataToFilter.hasEquity) cols.push(`"equity" > 0`);
+      if (data.hasEquity) cols.push(`"equity" > 0`);
     }
     idx++;
   }
