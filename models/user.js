@@ -15,9 +15,9 @@ const { BCRYPT_WORK_FACTOR } = require("../config.js");
 /** Related functions for users. */
 
 class User {
-  constructor(username, password, firstName, lastName, email, isAdmin) {
+  constructor({username, password, firstName, lastName, email, isAdmin}) {
     this.username = username;
-    this.password = password;
+    this.password = null;
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
@@ -128,7 +128,7 @@ class User {
   /** Given a username, return data about user.
    *
    * Returns { username, first_name, last_name, is_admin, jobs }
-   *   where jobs is { id, title, company_handle, company_name, state }
+   *   where jobs is [ jobId, jobId, ... ]
    *
    * Throws NotFoundError if user not found.
    **/
@@ -144,10 +144,10 @@ class User {
            WHERE username = $1`,
         [username],
     );
-
-    const user = userRes.rows[0];
-
-    if (!user) throw new NotFoundError(`No user: ${username}`);
+    if (!userRes.rows.length) throw new NotFoundError(`No user: ${username}`);
+    const user = new User(userRes.rows[0]);
+    await user.getAppliedJobs();
+    user.jobs = this.appliedJobs;
 
     return user;
   }
@@ -218,8 +218,10 @@ class User {
     /** Adds to user's applied jobs. */
 
   async applyForJob(jobId) {
-    await Application.create(this.username, jobId);
-    return jobId;
+    const id = await Application.create(this.username, jobId);
+    
+    if (!id) throw new NotFoundError(`No job id: ${jobId}`);
+    return id;
   }
 
   /** Find all applied jobs associated with a user.

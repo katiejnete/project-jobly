@@ -9,17 +9,17 @@ class Application {
    *
    * data should be { username, jobId }
    *
-   * Returns undefined
+   * Returns jobId
    *
    * */
 
   static async create({ username, jobId }) {
-    await db.query(
+    const jobId = await db.query(
         `INSERT INTO applications
         (username, job_id)
         VALUES ($1, $2)`
     ,[username, jobId]);
-    return;
+    return jobId;
   }
 }
 

@@ -20,7 +20,7 @@ class Company {
    *
    * Throws BadRequestError if company already in database.
    * */
-  constructor(handle, name, description, numEmployees, logoUrl) {
+  constructor({handle, name, description, numEmployees, logoUrl}) {
     this.handle = handle;
     this.name = name;
     this.description = description;
@@ -119,14 +119,7 @@ class Company {
     );
     if (!companyRes.rows.length)
       throw new NotFoundError(`No company: ${handle}`);
-    const c = companyRes.rows[0];
-    const company = new Company(
-      handle,
-      c.name,
-      c.description,
-      c.numEmployees,
-      c.logoUrl
-    );
+    const company = new Company(companyRes.rows[0]);
     await company.getJobs();
 
     return company;
