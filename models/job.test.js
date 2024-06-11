@@ -44,6 +44,20 @@ describe("create", function () {
       },
     ]);
   });
+
+  test("error for non-existing company", async function () {
+    try {
+      await Job.create({
+        title: "new",
+        salary: 100000,
+        equity: 0.01,
+        companyHandle: "doesNotExist",
+      });
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
 });
 
 /************************************** findAll */
