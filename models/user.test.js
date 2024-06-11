@@ -251,6 +251,15 @@ describe("add job application", function () {
     expect(appliedJobId).toEqual(1);
   });
 
+  test("duplicate job application", async function () {
+    try {
+      const user = await User.get("u2");
+      await user.applyForJob(2);
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
   test("not found if job id does not exist", async function () {
     try {
       const user = await User.get("u1");
