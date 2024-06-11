@@ -3,6 +3,7 @@
 const db = require("../db");
 const { NotFoundError } = require("../expressError");
 const Job = require("./job");
+const { BadRequestError } = require("../expressError");
 
 /** Related functions for applications. */
 
@@ -16,6 +17,9 @@ class Application {
    * */
 
   static async create(username, jobId) {
+    const duplicateCheck = await db.query(`SELECT username, job_id FROM applications WHERE username = $1 AND job_id = $2`, [username, jobId]);
+    if (duplicateCheck.rows[0]) throw new BadRequestError(`Duplicate application for job id: ${jobId}`);
+    
     await Job.get(jobId);
     const result = await db.query(
       `INSERT INTO applications

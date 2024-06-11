@@ -8,7 +8,7 @@ const {
   commonAfterEach,
   commonAfterAll,
 } = require("./_testCommon");
-const { NotFoundError } = require("../expressError.js");
+const { NotFoundError, BadRequestError } = require("../expressError.js");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -41,6 +41,16 @@ describe("create", function () {
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("duplicate job application", async function () {
+    try {
+      await Application.create(newApp.username, newApp.jobId);
+      await Application.create(newApp.username, newApp.jobId);
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
 });
