@@ -30,15 +30,10 @@ class Company {
   }
 
   static async create({ handle, name, description, numEmployees, logoUrl }) {
-    const duplicateCheck = await db.query(
-      `SELECT handle
-           FROM companies
-           WHERE handle = $1`,
-      [handle]
-    );
-
-    if (duplicateCheck.rows[0])
-      throw new BadRequestError(`Duplicate company: ${handle}`);
+    const uniqueNameCheck = await db.query(`SELECT name FROM companies WHERE name = $1`,[name]);
+    if (uniqueNameCheck.rows[0]) throw new BadRequestError(`Duplicate company name: ${name}`);
+    const duplicateCheck = await db.query(`SELECT handle FROM companies WHERE handle = $1`,[handle]);
+    if (duplicateCheck.rows[0]) throw new BadRequestError(`Duplicate company: ${handle}`);
 
     const result = await db.query(
       `INSERT INTO companies

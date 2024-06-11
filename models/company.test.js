@@ -55,6 +55,22 @@ describe("create", function () {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
+
+  test("bad request with same name", async function () {
+    try {
+      await Company.create(newCompany);
+      await Company.create({
+        handle: "new2",
+        name: "New",
+        description: "New Description",
+        numEmployees: 1,
+        logoUrl: "http://new.img",
+      });
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
 });
 
 /************************************** findAll */
