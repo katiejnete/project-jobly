@@ -21,14 +21,12 @@ class Application {
     if (duplicateCheck.rows[0]) throw new BadRequestError(`Duplicate application for job id: ${jobId}`);
     
     await Job.get(jobId);
-    const result = await db.query(
+    await db.query(
       `INSERT INTO applications
         (username, job_id)
         VALUES ($1, $2) RETURNING job_id AS "jobId"`,
       [username, jobId]
     );
-    const application = result.rows[0];
-    if (!application) throw new NotFoundError(`No job id: ${jobId}`);
   }
 }
 

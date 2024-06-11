@@ -190,8 +190,6 @@ class User {
     const user = result.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
-
-    delete user.password;
     return user;
   }
 
@@ -213,17 +211,6 @@ class User {
   /** Adds to user's applied jobs. */
 
   async applyForJob(jobId) {
-    const duplicateCheck = await db.query(
-      `SELECT *
-           FROM applications
-           WHERE username = $1 AND job_id = $2`,
-      [this.username, jobId]
-    );
-
-    if (duplicateCheck.rows[0]) {
-      throw new BadRequestError(`Duplicate application for job id: ${jobId}`);
-    }
-    
     await Application.create(this.username, jobId);
     return jobId;
   }
