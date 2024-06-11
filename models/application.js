@@ -15,16 +15,15 @@ class Application {
    * */
 
   static async create(username, jobId) {
-    try {
-      await db.query(
+
+      const result = await db.query(
         `INSERT INTO applications
         (username, job_id)
-        VALUES ($1, $2)`,
+        VALUES ($1, $2) RETURNING job_id AS "jobId"`,
         [username, jobId]
       );
-    } catch (err) {
-      throw new NotFoundError(`No job id: ${jobId}`);
-    }
+      const application = result.rows[0];
+      if (!application) throw new NotFoundError(`No job id: ${jobId}`);
   }
 }
 

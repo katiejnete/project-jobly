@@ -8,6 +8,7 @@ const {
 } = require("../helpers/sql");
 const jsonschema = require("jsonschema");
 const jobFilterSchema = require("../schemas/jobFilter.json");
+const Company = require("./company");
 
 /** Related functions for jobs. */
 
@@ -21,7 +22,7 @@ class Job {
    * */
 
   static async create({ title, salary, equity, companyHandle }) {
-
+    await Company.get(companyHandle);
     const result = await db.query(
       `INSERT INTO jobs
            (title, salary, equity, company_handle)

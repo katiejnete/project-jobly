@@ -42,6 +42,19 @@ describe("POST /jobs", function () {
     });
   });
 
+  test("bad request with non-existent company", async function () {
+    const resp = await request(app)
+      .post("/jobs")
+      .send({
+        title: "new",
+        salary: 100000,
+        equity: 0.01,
+        companyHandle: "doesNotExist",
+      })
+      .set("authorization", `Bearer ${u3Token}`);
+    expect(resp.statusCode).toEqual(404);
+  });
+
   test("bad request with missing data", async function () {
     const resp = await request(app)
       .post("/jobs")

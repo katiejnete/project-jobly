@@ -134,6 +134,8 @@ router.delete(
 
 /** POST /[username]/jobs/[id]  =>  { applied: jobId }
  *
+ * Creates job application for user.
+ * 
  * Authorization required: admin or same user
  **/
 
